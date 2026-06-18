@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  # PHP-FPM
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: dqin-ac-app
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - .:/var/www/html
+    networks:
+      - dqin-network
+    depends_on:
+      - db
+
+  # Nginx
+  nginx:
+    image: nginx:alpine
+    container_name: dqin-ac-nginx
+    restart: unless-stopped
+    ports:
+      - "8084:80"
+    volumes:
+      - .:/var/www/html
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - dqin-network
+    depends_on:
+      - app
+
+  # MySQL
+  db:
+    image: mysql:8.0
+    container_name: dqin-ac-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: dqin_ac
+      MYSQL_ROOT_PASSWORD: dqin_ac_password
+      MYSQL_USER: dqin_ac_user
+      MYSQL_PASSWORD: dqin_ac_password
+    ports:
+      - "33074:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - dqin-network
+
+  # phpMyAdmin (opsional, untuk manajemen DB)
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: dqin-ac-pma
+    restart: unless-stopped
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      UPLOAD_LIMIT: 100M
+    networks:
+      - dqin-network
+    depends_on:
+      - db
+
+networks:
+  dqin-network:
+    driver: bridge
+
+volumes:
+  db_data:
