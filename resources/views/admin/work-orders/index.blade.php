@@ -68,9 +68,25 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label class="form-label">Customer <span style="color:#dc3545;">*</span></label>
-                            <select id="customer_id" class="form-control" required style="width:100%;">
-                                <option value="">-- Select Customer --</option>
-                            </select>
+                            <div style="display:flex;gap:6px;">
+                                <select id="customer_id" class="form-control" required style="width:100%;">
+                                    <option value="">-- Select Customer --</option>
+                                </select>
+                                <button type="button" onclick="toggleNewCustomer()" class="btn btn-sm btn-success" style="white-space:nowrap;flex-shrink:0;" title="Add New Customer">
+                                    <i class="fa-solid fa-plus"></i>
+                                </button>
+                            </div>
+                            <div id="new-customer-form" style="display:none;margin-top:8px;padding:12px;border:1px solid #ddd;border-radius:8px;background:#fafafa;">
+                                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+                                    <input type="text" id="new_customer_name" class="form-control" placeholder="Full name *" style="font-size:.85rem;">
+                                    <input type="text" id="new_customer_phone" class="form-control" placeholder="Phone" style="font-size:.85rem;">
+                                </div>
+                                <input type="email" id="new_customer_email" class="form-control" placeholder="Email (optional)" style="font-size:.85rem;margin-bottom:8px;">
+                                <div style="display:flex;gap:6px;justify-content:flex-end;">
+                                    <button type="button" onclick="toggleNewCustomer()" class="btn btn-sm btn-secondary">Cancel</button>
+                                    <button type="button" onclick="saveNewCustomer()" class="btn btn-sm btn-primary"><i class="fa-solid fa-floppy-disk"></i> Save Customer</button>
+                                </div>
+                            </div>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Customer Unit (optional)</label>
@@ -211,6 +227,42 @@ function loadCustomers() {
             res.data.forEach(c => {
                 sel.append(`<option value="${c.id}">${e(c.full_name)} (${e(c.phone || '-')})</option>`);
             });
+        }
+    });
+}
+
+function toggleNewCustomer() {
+    const form = $('#new-customer-form');
+    form.slideToggle(200);
+    if (form.is(':visible')) {
+        $('#new_customer_name').focus();
+    }
+}
+
+function saveNewCustomer() {
+    const name = $('#new_customer_name').val().trim();
+    const phone = $('#new_customer_phone').val().trim();
+    const email = $('#new_customer_email').val().trim();
+
+    if (!name) {
+        Swal.fire('Validation Error', 'Customer name is required.', 'warning');
+        return;
+    }
+
+    $.ajax({
+        url: '{{ route("admin.customers.store") }}',
+        method: 'POST',
+        data: { full_name: name, phone: phone || null, email: email || null, _token: '{{ csrf_token() }}' },
+        success: function(res) {
+            const c = res.data;
+            $('#customer_id').append(`<option value="${c.id}" selected>${e(c.full_name)}${c.phone ? ' (' + e(c.phone) + ')' : ''}</option>`);
+            $('#new_customer_name, #new_customer_phone, #new_customer_email').val('');
+            toggleNewCustomer();
+            Swal.fire({ icon: 'success', title: 'Customer created!', timer: 1200, showConfirmButton: false });
+        },
+        error: function(xhr) {
+            const msg = xhr.responseJSON?.message || 'Failed to create customer.';
+            Swal.fire('Error', msg, 'error');
         }
     });
 }
