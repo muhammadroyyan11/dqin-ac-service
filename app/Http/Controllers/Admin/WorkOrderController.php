@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\WorkOrder;
 use App\Models\Technician;
+use App\Models\WorkOrderProgressLog;
 use App\Models\Customer;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
@@ -48,7 +49,7 @@ class WorkOrderController extends Controller
 
     public function detail(WorkOrder $workOrder)
     {
-        $workOrder->load('customer.customerUnits', 'customerUnit', 'technicians', 'serviceReports');
+        $workOrder->load('customer.customerUnits', 'customerUnit', 'technicians', 'serviceReports', 'progressLogs.technician', 'progressLogs.user');
         return view('admin.work-orders.detail', compact('workOrder'));
     }
 
@@ -89,6 +90,13 @@ class WorkOrderController extends Controller
                     'is_captain' => filter_var($tech['is_captain'], FILTER_VALIDATE_BOOLEAN),
                     'status' => 'assigned',
                 ];
+                WorkOrderProgressLog::create([
+                    'work_order_id' => $workOrder->id,
+                    'technician_id' => $tech['id'],
+                    'user_id' => auth()->id(),
+                    'status' => 'assigned',
+                    'note' => 'Technician assigned',
+                ]);
             }
             $workOrder->technicians()->sync($syncData);
         }
@@ -169,6 +177,14 @@ class WorkOrderController extends Controller
 
         $workOrder->technicians()->updateExistingPivot($request->technician_id, $updateData);
 
+        WorkOrderProgressLog::create([
+            'work_order_id' => $workOrder->id,
+            'technician_id' => $request->technician_id,
+            'user_id' => auth()->id(),
+            'status' => $request->status,
+            'note' => $request->progress_note,
+        ]);
+
         $allCompleted = $workOrder->technicians()
             ->wherePivot('status', '!=', 'completed')
             ->count() === 0;
@@ -189,10 +205,22 @@ class WorkOrderController extends Controller
             'completed_date' => now(),
         ]);
 
+        $techIds = $workOrder->technicians()->pluck('technician_id')->toArray();
+
         $workOrder->technicians()->updateExistingPivot(
-            $workOrder->technicians()->pluck('technician_id')->toArray(),
+            $techIds,
             ['status' => 'completed', 'completed_at' => now()]
         );
+
+        foreach ($techIds as $techId) {
+            WorkOrderProgressLog::create([
+                'work_order_id' => $workOrder->id,
+                'technician_id' => $techId,
+                'user_id' => auth()->id(),
+                'status' => 'completed',
+                'note' => 'Work order completed',
+            ]);
+        }
 
         return response()->json(['success' => true]);
     }

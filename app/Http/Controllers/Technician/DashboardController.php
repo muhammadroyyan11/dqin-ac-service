@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Technician;
 
 use App\Http\Controllers\Controller;
 use App\Models\WorkOrder;
+use App\Models\WorkOrderProgressLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -67,6 +68,14 @@ class DashboardController extends Controller
         }
 
         $workOrder->technicians()->updateExistingPivot($technician->id, $updateData);
+
+        WorkOrderProgressLog::create([
+            'work_order_id' => $workOrder->id,
+            'technician_id' => $technician->id,
+            'user_id' => $user->id,
+            'status' => $request->status,
+            'note' => $request->progress_note,
+        ]);
 
         $allCompleted = $workOrder->technicians()
             ->wherePivot('status', '!=', 'completed')

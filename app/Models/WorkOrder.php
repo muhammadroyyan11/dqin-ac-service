@@ -67,4 +67,9 @@ class WorkOrder extends Model
     {
         return $this->hasOne(Complaint::class);
     }
+
+    public function progressLogs()
+    {
+        return $this->hasMany(WorkOrderProgressLog::class);
+    }
 }
