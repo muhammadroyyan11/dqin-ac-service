@@ -131,23 +131,20 @@
         <div class="timeline">
             @foreach($logs as $log)
             <div class="timeline-item">
-                <div class="timeline-dot {{ $log->status === 'completed' ? 'dot-done' : ($log->status === 'in_progress' ? 'dot-progress' : 'dot-pending') }}"></div>
+                <div class="timeline-dot dot-default"></div>
                 <div class="timeline-content">
                     <div class="timeline-head">
-                        <span class="timeline-status {{ $log->status === 'completed' ? 'text-success' : ($log->status === 'in_progress' ? 'text-info' : 'text-secondary') }}">
-                            {{ ucfirst($log->status) }}
+                        <span class="timeline-user">
+                            <strong>{{ $log->user?->name ?? ($log->technician?->full_name ?? 'System') }}</strong>
+                            @if($log->technician)
+                            <span class="timeline-tech-badge">{{ $log->technician->full_name }}</span>
+                            @endif
                         </span>
-                        <span class="timeline-time">{{ $log->created_at->format('d M Y H:i') }}</span>
+                        <span class="timeline-time">{{ $log->created_at->diffForHumans() }}</span>
                     </div>
                     <div class="timeline-body">
-                        <strong>{{ $log->technician?->full_name ?? 'Unknown' }}</strong>
-                        @if($log->note && $log->note !== 'Technician assigned' && $log->note !== 'Work order completed')
-                        <p>{{ $log->note }}</p>
-                        @endif
+                        {{ $log->note }}
                     </div>
-                    @if($log->user)
-                    <div class="timeline-by">by {{ $log->user->name }}</div>
-                    @endif
                 </div>
             </div>
             @endforeach
@@ -161,31 +158,19 @@
 @if($workOrder->status !== 'completed' && $workOrder->status !== 'cancelled')
 <div class="card" style="margin-bottom:24px;">
     <div class="card-header">
-        <h5><i class="fa-solid fa-pen-to-square" style="color:var(--primary);"></i> Update Progress</h5>
+        <h5><i class="fa-solid fa-comment" style="color:var(--primary);"></i> Add Update</h5>
     </div>
     <div class="card-body">
-        <form id="progressForm" style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;">
-            <div style="flex:1;min-width:180px;">
-                <label style="display:block;font-size:.8rem;color:#888;margin-bottom:4px;">Technician</label>
-                <select id="progress_technician_id" class="form-control" required>
-                    <option value="">-- Select --</option>
-                    @foreach($workOrder->technicians as $tech)
-                    <option value="{{ $tech->id }}">{{ $tech->full_name }}</option>
-                    @endforeach
-                </select>
+        <form id="progressForm">
+            <div style="display:flex;gap:10px;align-items:flex-start;">
+                <div class="comment-avatar">{{ substr(auth()->user()->name, 0, 1) }}</div>
+                <div style="flex:1;">
+                    <textarea id="progress_note" class="form-control" rows="2" placeholder="Write an update..." style="resize:none;border-radius:12px;padding:12px 16px;"></textarea>
+                    <div style="display:flex;justify-content:flex-end;margin-top:8px;gap:6px;">
+                        <button type="submit" class="btn btn-primary btn-sm"><i class="fa-solid fa-paper-plane"></i> Post</button>
+                    </div>
+                </div>
             </div>
-            <div style="flex:1;min-width:140px;">
-                <label style="display:block;font-size:.8rem;color:#888;margin-bottom:4px;">Status</label>
-                <select id="progress_status" class="form-control" required>
-                    <option value="in_progress">In Progress</option>
-                    <option value="completed">Completed</option>
-                </select>
-            </div>
-            <div style="flex:2;min-width:200px;">
-                <label style="display:block;font-size:.8rem;color:#888;margin-bottom:4px;">Note</label>
-                <input type="text" id="progress_note" class="form-control" placeholder="Progress note...">
-            </div>
-            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-rotate"></i> Update</button>
         </form>
     </div>
 </div>
@@ -246,17 +231,15 @@
 .timeline-item{position:relative;padding-bottom:24px}
 .timeline-item:last-child{padding-bottom:0}
 .timeline-dot{position:absolute;left:-22px;top:4px;width:14px;height:14px;border-radius:50%;border:3px solid;background:#fff;z-index:1}
-.dot-done{border-color:#28a745}
-.dot-progress{border-color:#17a2b8}
-.dot-pending{border-color:#6c757d}
+.dot-default{border-color:var(--primary)}
 .timeline-content{background:#fafafa;border:1px solid #eee;border-radius:10px;padding:12px 16px}
-.timeline-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
-.timeline-status{font-weight:700;font-size:.8rem;text-transform:uppercase}
-.text-success{color:#28a745}.text-info{color:#17a2b8}.text-secondary{color:#6c757d}
+.timeline-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.timeline-user{font-size:.8rem;color:#444}
+.timeline-tech-badge{display:inline-block;font-size:.65rem;background:#e8f5e9;color:#2e7d32;padding:1px 7px;border-radius:10px;margin-left:4px;vertical-align:middle}
 .timeline-time{font-size:.75rem;color:#999}
-.timeline-body{font-size:.85rem;color:#444}
-.timeline-body p{margin:4px 0 0;color:#666}
-.timeline-by{font-size:.7rem;color:#aaa;margin-top:4px}
+.timeline-body{font-size:.875rem;color:#444;line-height:1.6}
+
+.comment-avatar{width:36px;height:36px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9rem;flex-shrink:0}
 </style>
 @endsection
 
@@ -264,12 +247,10 @@
 <script>
 $('#progressForm').on('submit', function(e) {
     e.preventDefault();
-    const technicianId = $('#progress_technician_id').val();
-    const status = $('#progress_status').val();
-    const note = $('#progress_note').val();
+    const note = $('#progress_note').val().trim();
 
-    if (!technicianId) {
-        Swal.fire('Validation', 'Select a technician.', 'warning');
+    if (!note) {
+        Swal.fire('Validation', 'Write an update.', 'warning');
         return;
     }
 
@@ -278,16 +259,15 @@ $('#progressForm').on('submit', function(e) {
         method: 'POST',
         data: {
             _token: '{{ csrf_token() }}',
-            technician_id: technicianId,
-            status: status,
-            progress_note: note
+            note: note,
         },
         success: function() {
-            Swal.fire({ icon: 'success', title: 'Progress Updated!', timer: 1500, showConfirmButton: false });
-            setTimeout(() => location.reload(), 1500);
+            $('#progress_note').val('');
+            Swal.fire({ icon: 'success', title: 'Posted!', timer: 1200, showConfirmButton: false });
+            setTimeout(() => location.reload(), 1200);
         },
         error: function(xhr) {
-            Swal.fire('Error', xhr.responseJSON?.message || 'Failed to update progress.', 'error');
+            Swal.fire('Error', xhr.responseJSON?.message || 'Failed to post update.', 'error');
         }
     });
 });

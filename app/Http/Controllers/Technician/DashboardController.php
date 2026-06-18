@@ -51,20 +51,15 @@ class DashboardController extends Controller
         }
 
         $request->validate([
-            'status' => 'required|string|in:assigned,in_progress,completed',
-            'progress_note' => 'nullable|string',
+            'note' => 'required|string',
         ]);
 
         $updateData = [
-            'status' => $request->status,
+            'status' => 'in_progress',
         ];
 
-        if ($request->has('progress_note')) {
-            $updateData['progress_note'] = $request->progress_note;
-        }
-
-        if ($request->status === 'completed') {
-            $updateData['completed_at'] = now();
+        if ($request->has('note')) {
+            $updateData['progress_note'] = $request->note;
         }
 
         $workOrder->technicians()->updateExistingPivot($technician->id, $updateData);
@@ -73,17 +68,10 @@ class DashboardController extends Controller
             'work_order_id' => $workOrder->id,
             'technician_id' => $technician->id,
             'user_id' => $user->id,
-            'status' => $request->status,
-            'note' => $request->progress_note,
+            'note' => $request->note,
         ]);
 
-        $allCompleted = $workOrder->technicians()
-            ->wherePivot('status', '!=', 'completed')
-            ->count() === 0;
-
-        if ($allCompleted && $workOrder->technicians()->count() > 0) {
-            $workOrder->update(['status' => 'completed', 'completed_date' => now()]);
-        } elseif ($request->status === 'in_progress' && $workOrder->status === 'pending') {
+        if ($workOrder->status === 'pending') {
             $workOrder->update(['status' => 'in_progress']);
         }
 

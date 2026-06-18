@@ -150,48 +150,16 @@ class WorkOrderController extends Controller
     public function updateProgress(Request $request, WorkOrder $workOrder)
     {
         $request->validate([
-            'technician_id' => 'required|exists:technicians,id',
-            'status' => 'required|string|in:assigned,in_progress,completed',
-            'progress_note' => 'nullable|string',
+            'note' => 'required|string',
         ]);
-
-        $pivot = $workOrder->technicians()
-            ->where('technician_id', $request->technician_id)
-            ->first();
-
-        if (!$pivot) {
-            return response()->json(['success' => false, 'message' => 'Technician not assigned to this work order.'], 404);
-        }
-
-        $updateData = [
-            'status' => $request->status,
-        ];
-
-        if ($request->has('progress_note')) {
-            $updateData['progress_note'] = $request->progress_note;
-        }
-
-        if ($request->status === 'completed') {
-            $updateData['completed_at'] = now();
-        }
-
-        $workOrder->technicians()->updateExistingPivot($request->technician_id, $updateData);
 
         WorkOrderProgressLog::create([
             'work_order_id' => $workOrder->id,
-            'technician_id' => $request->technician_id,
             'user_id' => auth()->id(),
-            'status' => $request->status,
-            'note' => $request->progress_note,
+            'note' => $request->note,
         ]);
 
-        $allCompleted = $workOrder->technicians()
-            ->wherePivot('status', '!=', 'completed')
-            ->count() === 0;
-
-        if ($allCompleted && $workOrder->technicians()->count() > 0) {
-            $workOrder->update(['status' => 'completed', 'completed_date' => now()]);
-        } elseif ($request->status === 'in_progress' && $workOrder->status === 'pending') {
+        if ($workOrder->status === 'pending') {
             $workOrder->update(['status' => 'in_progress']);
         }
 
