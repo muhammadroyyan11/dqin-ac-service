@@ -26,8 +26,8 @@ class PaymentController extends Controller
                 return $p->invoice?->customer?->full_name ?? '-';
             })
             ->addColumn('action', function ($p) {
-                return '<button class="edit-btn" data-id="'.$p->id.'">Edit</button>
-                        <button class="delete-btn" data-id="'.$p->id.'">Delete</button>';
+                return '<button class="btn btn-sm btn-primary edit-btn" data-id="'.$p->id.'"><i class="fa-solid fa-pen"></i></button>
+                        <button class="btn btn-sm btn-danger delete-btn" data-id="'.$p->id.'"><i class="fa-solid fa-trash"></i></button>';
             })
             ->editColumn('amount', function ($p) {
                 return number_format($p->amount, 2);

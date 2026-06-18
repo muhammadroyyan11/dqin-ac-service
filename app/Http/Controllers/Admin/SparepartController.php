@@ -20,8 +20,8 @@ class SparepartController extends Controller
 
         return DataTables::of($spareparts)
             ->addColumn('action', function ($sparepart) {
-                return '<button class="edit-btn" data-id="'.$sparepart->id.'">Edit</button>
-                        <button class="delete-btn" data-id="'.$sparepart->id.'">Delete</button>';
+                return '<button class="btn btn-sm btn-primary edit-btn" data-id="'.$sparepart->id.'"><i class="fa-solid fa-pen"></i></button>
+                        <button class="btn btn-sm btn-danger delete-btn" data-id="'.$sparepart->id.'"><i class="fa-solid fa-trash"></i></button>';
             })
             ->editColumn('price', function ($sparepart) {
                 return number_format($sparepart->price, 2);

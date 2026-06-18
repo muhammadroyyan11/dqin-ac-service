@@ -11,11 +11,12 @@ class Technician extends Model
 
     protected $fillable = [
         'user_id',
-        'nik',
+        'identity',
         'full_name',
         'phone',
         'address',
         'specialization',
+        'start_date',
         'is_active',
     ];
 

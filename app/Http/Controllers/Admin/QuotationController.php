@@ -23,8 +23,8 @@ class QuotationController extends Controller
                 return $quotation->customer ? $quotation->customer->full_name : '-';
             })
             ->addColumn('action', function ($quotation) {
-                return '<button class="edit-btn" data-id="'.$quotation->id.'">Edit</button>
-                        <button class="delete-btn" data-id="'.$quotation->id.'">Delete</button>';
+                return '<button class="btn btn-sm btn-primary edit-btn" data-id="'.$quotation->id.'"><i class="fa-solid fa-pen"></i></button>
+                        <button class="btn btn-sm btn-danger delete-btn" data-id="'.$quotation->id.'"><i class="fa-solid fa-trash"></i></button>';
             })
             ->editColumn('total', function ($quotation) {
                 return number_format($quotation->total, 2);

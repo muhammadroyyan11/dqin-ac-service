@@ -31,8 +31,8 @@ class ServiceReportController extends Controller
                     : ($r->findings ?? '-');
             })
             ->addColumn('action', function ($r) {
-                return '<button class="edit-btn" data-id="'.$r->id.'">Edit</button>
-                        <button class="delete-btn" data-id="'.$r->id.'">Delete</button>';
+                return '<button class="btn btn-sm btn-primary edit-btn" data-id="'.$r->id.'"><i class="fa-solid fa-pen"></i></button>
+                        <button class="btn btn-sm btn-danger delete-btn" data-id="'.$r->id.'"><i class="fa-solid fa-trash"></i></button>';
             })
             ->rawColumns(['action'])
             ->make(true);

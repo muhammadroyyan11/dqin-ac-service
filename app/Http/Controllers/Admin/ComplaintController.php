@@ -23,8 +23,8 @@ class ComplaintController extends Controller
                 return $c->customer?->full_name ?? '-';
             })
             ->addColumn('action', function ($c) {
-                return '<button class="edit-btn" data-id="'.$c->id.'">Edit</button>
-                        <button class="delete-btn" data-id="'.$c->id.'">Delete</button>';
+                return '<button class="btn btn-sm btn-primary edit-btn" data-id="'.$c->id.'"><i class="fa-solid fa-pen"></i></button>
+                        <button class="btn btn-sm btn-danger delete-btn" data-id="'.$c->id.'"><i class="fa-solid fa-trash"></i></button>';
             })
             ->editColumn('created_at', function ($c) {
                 return $c->created_at ? $c->created_at->format('Y-m-d H:i') : '-';

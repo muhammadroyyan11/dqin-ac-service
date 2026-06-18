@@ -115,13 +115,14 @@ class RolePermissionSeeder extends Seeder
                 'name' => 'Admin Utama',
                 'email' => 'admin@dqin-ac.com',
                 'role' => 'super_admin',
-                'technician' => [
-                    'nik' => 'TEC-ADMIN',
-                    'full_name' => 'Admin Utama',
-                    'phone' => '0812-3456-7890',
-                    'address' => 'Jakarta',
-                    'specialization' => 'Senior Technician',
-                ],
+                    'technician' => [
+                        'identity' => 'TEC-ADMIN',
+                        'full_name' => 'Admin Utama',
+                        'phone' => '0812-3456-7890',
+                        'address' => 'Jakarta',
+                        'specialization' => 'Senior Technician',
+                        'start_date' => '2020-06-01',
+                    ],
             ],
             [
                 'name' => 'Admin Operasional',
@@ -134,11 +135,12 @@ class RolePermissionSeeder extends Seeder
                 'email' => 'teknisi1@dqin-ac.com',
                 'role' => 'teknisi',
                 'technician' => [
-                    'nik' => 'TEC-001',
+                    'identity' => 'TEC-001',
                     'full_name' => 'Budi Teknisi',
                     'phone' => '0812-3456-7891',
                     'address' => 'Jakarta',
                     'specialization' => 'AC Split, Freon',
+                    'start_date' => '2024-01-15',
                 ],
             ],
             [
@@ -146,11 +148,12 @@ class RolePermissionSeeder extends Seeder
                 'email' => 'teknisi2@dqin-ac.com',
                 'role' => 'teknisi',
                 'technician' => [
-                    'nik' => 'TEC-002',
+                    'identity' => 'TEC-002',
                     'full_name' => 'Agung Teknisi',
                     'phone' => '0812-3456-7892',
                     'address' => 'Jakarta',
                     'specialization' => 'AC Central, Chiller',
+                    'start_date' => '2023-08-01',
                 ],
             ],
             [

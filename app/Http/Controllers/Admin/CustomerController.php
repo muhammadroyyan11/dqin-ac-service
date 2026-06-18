@@ -20,13 +20,13 @@ class CustomerController extends Controller
 
         return DataTables::of($customers)
             ->addColumn('action', function ($customer) {
-                return '<button class="edit-btn" data-id="'.$customer->id.'">Edit</button>
-                        <button class="delete-btn" data-id="'.$customer->id.'">Delete</button>';
+                return '<button class="btn btn-sm btn-primary edit-btn" data-id="'.$customer->id.'"><i class="fa-solid fa-pen"></i></button>
+                        <button class="btn btn-sm btn-danger delete-btn" data-id="'.$customer->id.'"><i class="fa-solid fa-trash"></i></button>';
             })
             ->editColumn('is_active', function ($customer) {
                 return $customer->is_active
-                    ? '<span class="badge-active">Active</span>'
-                    : '<span class="badge-inactive">Inactive</span>';
+                    ? '<span class="badge badge-success">Active</span>'
+                    : '<span class="badge badge-secondary">Inactive</span>';
             })
             ->rawColumns(['action', 'is_active'])
             ->make(true);

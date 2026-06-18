@@ -23,8 +23,8 @@ class InvoiceController extends Controller
                 return $invoice->customer ? $invoice->customer->full_name : '-';
             })
             ->addColumn('action', function ($invoice) {
-                return '<button class="edit-btn" data-id="'.$invoice->id.'">Edit</button>
-                        <button class="delete-btn" data-id="'.$invoice->id.'">Delete</button>';
+                return '<button class="btn btn-sm btn-primary edit-btn" data-id="'.$invoice->id.'"><i class="fa-solid fa-pen"></i></button>
+                        <button class="btn btn-sm btn-danger delete-btn" data-id="'.$invoice->id.'"><i class="fa-solid fa-trash"></i></button>';
             })
             ->editColumn('total', function ($invoice) {
                 return number_format($invoice->total, 2);

@@ -208,7 +208,7 @@
                 ['route' => 'admin.payments.index', 'icon' => 'fa-solid fa-credit-card', 'name' => 'Payments', 'perm' => 'payments.view'],
             ]],
             ['label' => 'Pengaturan', 'items' => [
-                ['route' => 'admin.contracts.index', 'icon' => 'fa-solid fa-handshake', 'name' => 'Contracts', 'perm' => 'contracts.view'],
+                ['route' => 'admin.maintenance-contracts.index', 'icon' => 'fa-solid fa-handshake', 'name' => 'Contracts', 'perm' => 'contracts.view'],
                 ['route' => 'admin.roles.index', 'icon' => 'fa-solid fa-shield-halved', 'name' => 'Roles', 'perm' => 'roles.view'],
                 ['route' => 'admin.permissions.index', 'icon' => 'fa-solid fa-key', 'name' => 'Permissions', 'perm' => 'permissions.view'],
             ]],

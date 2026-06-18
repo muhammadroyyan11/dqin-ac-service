@@ -19,8 +19,8 @@ class CustomerUnitController extends Controller
         return DataTables::of($units)
             ->addColumn('customer_name', fn($u) => $u->customer?->full_name ?? '-')
             ->addColumn('action', fn($u) => '
-                <button onclick="editUnit('.$u->id.')" class="text-indigo-600 hover:text-indigo-900 font-medium text-sm">Edit</button>
-                <button onclick="deleteUnit('.$u->id.')" class="text-red-600 hover:text-red-900 font-medium text-sm ml-2">Delete</button>
+                <button onclick="editUnit('.$u->id.')" class="btn btn-sm btn-primary"><i class="fa-solid fa-pen"></i></button>
+                <button onclick="deleteUnit('.$u->id.')" class="btn btn-sm btn-danger"><i class="fa-solid fa-trash"></i></button>
             ')
             ->rawColumns(['action'])
             ->make(true);

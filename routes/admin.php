@@ -15,9 +15,14 @@ use App\Http\Controllers\Admin\QuotationController;
 use App\Http\Controllers\Admin\SparepartController;
 use App\Http\Controllers\Admin\TechnicianController;
 use App\Http\Controllers\Admin\WorkOrderController;
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified'])->group(function () {
+
+    Route::get('/users/list', function () {
+        return User::select('id', 'name', 'email')->get();
+    })->name('users.list');
 
     // Dashboard — view permission
     Route::middleware('permission:dashboard.view')->group(function () {

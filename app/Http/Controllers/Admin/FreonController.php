@@ -20,8 +20,8 @@ class FreonController extends Controller
 
         return DataTables::of($freon)
             ->addColumn('action', function ($freon) {
-                return '<button class="edit-btn" data-id="'.$freon->id.'">Edit</button>
-                        <button class="delete-btn" data-id="'.$freon->id.'">Delete</button>';
+                return '<button class="btn btn-sm btn-primary edit-btn" data-id="'.$freon->id.'"><i class="fa-solid fa-pen"></i></button>
+                        <button class="btn btn-sm btn-danger delete-btn" data-id="'.$freon->id.'"><i class="fa-solid fa-trash"></i></button>';
             })
             ->editColumn('price_per_unit', function ($freon) {
                 return number_format($freon->price_per_unit, 2);
