@@ -72,8 +72,8 @@ class WorkOrderController extends Controller
             'notes'           => 'nullable|string',
             'total_estimate'  => 'nullable|numeric',
             'technicians'     => 'nullable|array',
-            'technicians.*.id' => 'exists:technicians,id',
-            'technicians.*.is_captain' => 'boolean',
+            'technicians.*.id' => 'required|integer|exists:technicians,id',
+            'technicians.*.is_captain' => 'required|in:true,false,1,0',
         ]);
 
         if (empty($validated['wo_number'])) {
@@ -86,7 +86,7 @@ class WorkOrderController extends Controller
             $syncData = [];
             foreach ($request->technicians as $tech) {
                 $syncData[$tech['id']] = [
-                    'is_captain' => $tech['is_captain'] ?? false,
+                    'is_captain' => filter_var($tech['is_captain'], FILTER_VALIDATE_BOOLEAN),
                     'status' => 'assigned',
                 ];
             }
@@ -117,8 +117,8 @@ class WorkOrderController extends Controller
             'notes'           => 'nullable|string',
             'total_estimate'  => 'nullable|numeric',
             'technicians'     => 'nullable|array',
-            'technicians.*.id' => 'exists:technicians,id',
-            'technicians.*.is_captain' => 'boolean',
+            'technicians.*.id' => 'required|integer|exists:technicians,id',
+            'technicians.*.is_captain' => 'required|in:true,false,1,0',
         ]);
 
         $workOrder->update($validated);
@@ -129,7 +129,7 @@ class WorkOrderController extends Controller
             foreach ($request->technicians as $tech) {
                 $existing = $existingPivots->get($tech['id']);
                 $syncData[$tech['id']] = [
-                    'is_captain' => $tech['is_captain'] ?? false,
+                    'is_captain' => filter_var($tech['is_captain'], FILTER_VALIDATE_BOOLEAN),
                     'status' => $existing ? $existing->pivot->status : 'assigned',
                 ];
             }
