@@ -251,6 +251,10 @@ TEKNOLOGI & FITUR WAJIB
 - ✅ WO view directory renamed (underscore → hyphen) fix View not found
 - ✅ WO number auto-generated
 - ✅ Description textarea diperbesar (rows=8, CKEditor min-height 250px)
+- ✅ WO detail page redesigned with modern layout
+- ✅ WO progress timeline with logs table (social-media-style comments)
+- ✅ Inline create customer from WO modal (+ button)
+- ✅ Fix: view directory renamed, nik→identity, nullable customer fields
 
 ---
 
