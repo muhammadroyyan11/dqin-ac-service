@@ -61,7 +61,7 @@ class WorkOrderController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'wo_number'       => 'required|string|max:50|unique:work_orders,wo_number',
+            'wo_number'       => 'nullable|string|max:50|unique:work_orders,wo_number',
             'customer_id'     => 'required|exists:customers,id',
             'customer_unit_id' => 'nullable|exists:customer_units,id',
             'service_type'    => 'required|string|max:100',
@@ -75,6 +75,10 @@ class WorkOrderController extends Controller
             'technicians.*.id' => 'exists:technicians,id',
             'technicians.*.is_captain' => 'boolean',
         ]);
+
+        if (empty($validated['wo_number'])) {
+            $validated['wo_number'] = 'WO-' . now()->format('Ymd') . '-' . str_pad(rand(1, 999), 3, '0', STR_PAD_LEFT);
+        }
 
         $workOrder = WorkOrder::create($validated);
 

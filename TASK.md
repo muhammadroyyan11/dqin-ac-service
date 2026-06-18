@@ -117,18 +117,22 @@ TEKNOLOGI & FITUR WAJIB
 - [x] Status garansi
 
 ### 4. Work Order (WO)
-- [x] Pembuatan WO
-- [x] Penugasan teknisi
-- [x] Status pekerjaan
+- [x] Pembuatan WO dengan form (CKEditor, modal)
+- [x] Assign multiple teknisi + pilih Captain
+- [x] Status & progress per teknisi
+- [x] Halaman detail WO
+- [x] Update progress oleh admin
+- [x] Complete work order
 
 ### 5. Jadwal Teknisi
 - [ ] Kalender pekerjaan
 - [ ] Monitoring jadwal
 
 ### 6. Mobile Teknisi
-- [ ] Login teknisi
-- [ ] Terima tugas
-- [ ] Update progress
+- [x] Login teknisi (via users)
+- [x] Dashboard teknisi (daftar WO)
+- [x] Detail WO + update progress
+- [x] Terima tugas
 
 ### 7. Dokumentasi Pekerjaan
 - [ ] Foto sebelum
@@ -202,12 +206,23 @@ TEKNOLOGI & FITUR WAJIB
 ## 👥 D. ROLE & AUTHENTICATION
 
 ### Role Pengguna
-- [x] Super Admin - Akses seluruh sistem
-- [ ] Admin Operasional - Customer, WO, Jadwal, Invoice
-- [ ] Teknisi - Tugas lapangan via mobile
-- [ ] Supervisor - Monitoring & approval
-- [ ] Customer - Booking, riwayat, tracking
+- [x] Super Admin - Akses seluruh sistem (termasuk teknisi)
+- [x] Admin Operasional - Customer, WO, Service Reports, Complaints, Quotations, Invoices, Payments
+- [x] Teknisi - Tugas lapangan via dashboard
+- [x] Supervisor - Monitoring read-only
+- [x] Customer - Dashboard sendiri
 
+### Permission System
+- [x] Role CRUD + assign permissions
+- [x] Permission CRUD (57 permissions)
+- [x] Middleware permission per route (view/create/edit/delete)
+- [x] Sidebar dinamis by permission
+- [x] User - Role many-to-many
+- [x] Login redirect by role
+- [x] Cache permission + flush on update
+- [x] Super Admin bypass all permissions
+
+---
 
 ## 📊 PROGRESS OVERALL
 
@@ -215,17 +230,27 @@ TEKNOLOGI & FITUR WAJIB
 |--------|-------|-----------|-------------|
 | Infrastructure | 8 | 7 | 88% |
 | Landing Page | 11 | 4 | 36% |
-| Backoffice | 20 | 11 | 55% |
-| Role & Auth | 5 | 1 | 20% |
-| Teknologi | 5 | 4 | 80% |
-| **TOTAL** | **49** | **27** | **55%** |
+| Backoffice | 20 | 12 | 60% |
+| Role & Auth | 5 | 5 | 100% |
+| Permission System | 8 | 8 | 100% |
+| Teknologi | 5 | 5 | 100% |
+| **TOTAL** | **57** | **41** | **72%** |
 
 ### 📝 Catatan Update
 - ✅ Favicon SVG double-quote HTML bug fixed
 - ✅ All text translated to English
-- ✅ Design overhaul: minimal, professional, no emojis
+- ✅ Design overhaul: minimal, professional
 - ✅ Emojis diganti SVG icons
-- ✅ Gradient dihilangkan, warna disederhanakan (blue + gray)
+- ✅ Custom CSS classes ditambahkan (whatsapp-float, btn-primary, dll)
+- ✅ Work Order create/edit dengan CKEditor + multiple technician
+- ✅ Work Order detail page + progress tracking
+- ✅ Role & Permission management full system
+- ✅ Technician Dashboard + login flow
+- ✅ Redirect login by role
+- ✅ NIK → Identity + Start Date untuk teknisi
+- ✅ WO view directory renamed (underscore → hyphen) fix View not found
+- ✅ WO number auto-generated
+- ✅ Description textarea diperbesar (rows=8, CKEditor min-height 250px)
 
 ---
 

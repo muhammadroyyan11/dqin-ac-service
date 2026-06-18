@@ -48,8 +48,8 @@
                     <input type="hidden" id="wo_id">
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="form-label">WO Number <span style="color:#dc3545;">*</span></label>
-                            <input type="text" id="wo_number" class="form-control" placeholder="Auto or manual" required>
+                            <label class="form-label">WO Number</label>
+                            <input type="text" id="wo_number" class="form-control" readonly style="background:#f5f5f5;cursor:not-allowed;">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Service Type <span style="color:#dc3545;">*</span></label>
@@ -81,7 +81,7 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label">Description</label>
-                        <textarea id="description" class="form-control" rows="3"></textarea>
+                        <textarea id="description" class="form-control" rows="8"></textarea>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
@@ -157,6 +157,7 @@
 .captain-badge { font-size:.7rem;background:var(--primary);color:#fff;padding:2px 8px;border-radius:12px;font-weight:600; }
 .badge-captain { background:var(--primary);color:#fff;font-size:.7rem;padding:1px 6px;border-radius:10px; }
 .tech-badge { display:inline-block;padding:2px 8px;border-radius:12px;font-size:.75rem;background:#e8f5e9;color:#2e7d32;margin:2px;white-space:nowrap; }
+.ck-editor__editable { min-height: 250px; }
 </style>
 @endsection
 
@@ -239,7 +240,7 @@ function loadTechnicians() {
             container.append(`
                 <div class="tech-check-item">
                     <input type="checkbox" class="tech-checkbox" value="${t.id}" data-name="${e(t.full_name)}" ${checked}>
-                    <span class="tech-label">${e(t.full_name)} (${e(t.nik || '-')})</span>
+                    <span class="tech-label">${e(t.full_name)} (${e(t.identity || '-')})</span>
                     <label style="font-size:.75rem;color:#888;display:flex;align-items:center;gap:4px;">
                         <input type="radio" name="captain" value="${t.id}" ${isCaptain} style="accent-color:var(--primary);">
                         Captain
@@ -269,6 +270,16 @@ function updateSelectedTechnicians() {
     }
 }
 
+function generateWONumber() {
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, '0');
+    const d = String(now.getDate()).padStart(2, '0');
+    const dateStr = `${y}${m}${d}`;
+    const rand = String(Math.floor(Math.random() * 900) + 100);
+    $('#wo_number').val(`WO-${dateStr}-${rand}`);
+}
+
 function openModal(editId) {
     $('#woModal').addClass('show');
     $('#modalBackdrop').addClass('show');
@@ -281,6 +292,10 @@ function openModal(editId) {
 
     if (ckDescription) ckDescription.setData('');
     if (ckNotes) ckNotes.setData('');
+
+    if (!editId) {
+        generateWONumber();
+    }
 
     loadTechnicians();
 
@@ -355,8 +370,8 @@ function saveWorkOrder() {
         data.completed_date = $('#completed_date').val() || new Date().toISOString().substring(0,16);
     }
 
-    if (!data.wo_number || !data.customer_id || !data.service_type) {
-        Swal.fire('Validation Error', 'WO Number, Customer, and Service Type are required.', 'warning');
+    if (!data.customer_id || !data.service_type) {
+        Swal.fire('Validation Error', 'Customer and Service Type are required.', 'warning');
         return;
     }
 
@@ -419,7 +434,7 @@ function initCKEditor() {
             heading: { options: [
                 { model: 'paragraph', title: 'Paragraph', class: 'ck-heading_paragraph' },
                 { model: 'heading3', view: 'h3', title: 'Heading', class: 'ck-heading_heading3' },
-            ]}
+            ]},
         }).then(editor => {
             ckDescription = editor;
         }).catch(() => {});
