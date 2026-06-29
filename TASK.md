@@ -147,9 +147,11 @@ TEKNOLOGI & FITUR WAJIB
 - [ ] Approval customer
 
 ### 10. Service Report
-- [ ] Hasil pemeriksaan
-- [ ] Tindakan perbaikan
-- [ ] Sparepart yang digunakan
+- [x] Hasil pemeriksaan (CKEditor)
+- [x] Tindakan perbaikan (CKEditor)
+- [x] Sparepart yang digunakan (pilih dari inventory + quantity)
+- [x] Foto before/after
+- [x] Customer notes
 
 ### 11. Inventory Sparepart
 - [x] Stok masuk
@@ -230,11 +232,11 @@ TEKNOLOGI & FITUR WAJIB
 |--------|-------|-----------|-------------|
 | Infrastructure | 8 | 7 | 88% |
 | Landing Page | 11 | 4 | 36% |
-| Backoffice | 20 | 12 | 60% |
+| Backoffice | 20 | 13 | 65% |
 | Role & Auth | 5 | 5 | 100% |
 | Permission System | 8 | 8 | 100% |
 | Teknologi | 5 | 5 | 100% |
-| **TOTAL** | **57** | **41** | **72%** |
+| **TOTAL** | **57** | **42** | **74%** |
 
 ### 📝 Catatan Update
 - ✅ Favicon SVG double-quote HTML bug fixed
@@ -255,6 +257,7 @@ TEKNOLOGI & FITUR WAJIB
 - ✅ WO progress timeline with logs table (social-media-style comments)
 - ✅ Inline create customer from WO modal (+ button)
 - ✅ Fix: view directory renamed, nik→identity, nullable customer fields
+- ✅ Service Report CRUD with CKEditor, spareparts select, photos, customer notes
 
 ---
 
