@@ -11,7 +11,7 @@ class ServiceReportController extends Controller
 {
     public function index()
     {
-        return view('admin.service_reports.index');
+        return view('admin.service-reports.index');
     }
 
     public function data()
@@ -26,9 +26,26 @@ class ServiceReportController extends Controller
                 return $r->technician?->full_name ?? '-';
             })
             ->addColumn('findings_truncated', function ($r) {
-                return strlen($r->findings) > 80
-                    ? substr($r->findings, 0, 80) . '...'
-                    : ($r->findings ?? '-');
+                return strlen(strip_tags($r->findings ?? '')) > 80
+                    ? substr(strip_tags($r->findings), 0, 80) . '...'
+                    : ($r->findings ? strip_tags($r->findings) : '-');
+            })
+            ->addColumn('actions_taken_truncated', function ($r) {
+                return strlen(strip_tags($r->actions_taken ?? '')) > 80
+                    ? substr(strip_tags($r->actions_taken), 0, 80) . '...'
+                    : ($r->actions_taken ? strip_tags($r->actions_taken) : '-');
+            })
+            ->addColumn('spareparts_summary', function ($r) {
+                $spareparts = $r->spareparts_used;
+                if (!$spareparts || !is_array($spareparts) || count($spareparts) === 0) {
+                    return '-';
+                }
+                $labels = array_map(function ($sp) {
+                    $name = $sp['name'] ?? 'Item #' . ($sp['id'] ?? '');
+                    $qty = $sp['qty'] ?? 1;
+                    return $name . ' x' . $qty;
+                }, $spareparts);
+                return implode(', ', $labels);
             })
             ->addColumn('action', function ($r) {
                 return '<button class="btn btn-sm btn-primary edit-btn" data-id="'.$r->id.'"><i class="fa-solid fa-pen"></i></button>
@@ -49,12 +66,11 @@ class ServiceReportController extends Controller
             'before_photo'   => 'nullable|string|max:255',
             'after_photo'    => 'nullable|string|max:255',
             'customer_notes' => 'nullable|string',
-            'customer_signature' => 'nullable|string',
         ]);
 
         $report = ServiceReport::create($validated);
 
-        return response()->json(['success' => true, 'data' => $report]);
+        return response()->json(['success' => true, 'data' => $report->load('workOrder', 'technician')]);
     }
 
     public function show(ServiceReport $serviceReport)
@@ -75,12 +91,11 @@ class ServiceReportController extends Controller
             'before_photo'   => 'nullable|string|max:255',
             'after_photo'    => 'nullable|string|max:255',
             'customer_notes' => 'nullable|string',
-            'customer_signature' => 'nullable|string',
         ]);
 
         $serviceReport->update($validated);
 
-        return response()->json(['success' => true, 'data' => $serviceReport]);
+        return response()->json(['success' => true, 'data' => $serviceReport->load('workOrder', 'technician')]);
     }
 
     public function destroy(ServiceReport $serviceReport)
