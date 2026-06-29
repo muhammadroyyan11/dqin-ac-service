@@ -176,6 +176,54 @@
 </div>
 @endif
 
+<div class="card" style="margin-bottom:24px;">
+    <div class="card-header">
+        <h5><i class="fa-solid fa-camera" style="color:var(--primary);"></i> Photos ({{ $workOrder->photos->count() }})</h5>
+    </div>
+    <div class="card-body">
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:16px;" id="photo-gallery">
+            @foreach($workOrder->photos as $photo)
+            <div class="photo-item" data-id="{{ $photo->id }}">
+                <div class="photo-img">
+                    <img src="{{ asset('storage/' . $photo->photo_path) }}" alt="{{ $photo->caption ?? 'Photo' }}">
+                    <button class="photo-delete" onclick="deletePhoto({{ $photo->id }})" title="Delete">&times;</button>
+                </div>
+                <div class="photo-info">
+                    <span class="photo-type {{ $photo->type }}">{{ ucfirst($photo->type) }}</span>
+                    @if($photo->caption)
+                    <span class="photo-caption">{{ $photo->caption }}</span>
+                    @endif
+                </div>
+            </div>
+            @endforeach
+        </div>
+        @if($workOrder->status !== 'completed' && $workOrder->status !== 'cancelled')
+        <form id="photoUploadForm" enctype="multipart/form-data">
+            <p style="font-size:.85rem;font-weight:600;color:#555;margin-bottom:10px;">Upload Photo</p>
+            <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;">
+                <div style="flex:1;min-width:160px;">
+                    <label style="display:block;font-size:.8rem;color:#888;margin-bottom:4px;">Type</label>
+                    <select id="photo_type" class="form-control" required>
+                        <option value="before">Before</option>
+                        <option value="after">After</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div style="flex:2;min-width:200px;">
+                    <label style="display:block;font-size:.8rem;color:#888;margin-bottom:4px;">Photo</label>
+                    <input type="file" id="photo_file" class="form-control" accept="image/*" required style="padding:6px 10px;">
+                </div>
+                <div style="flex:2;min-width:160px;">
+                    <label style="display:block;font-size:.8rem;color:#888;margin-bottom:4px;">Caption (optional)</label>
+                    <input type="text" id="photo_caption" class="form-control" placeholder="Add caption..." style="padding:6px 10px;">
+                </div>
+                <button type="submit" class="btn btn-primary btn-sm"><i class="fa-solid fa-upload"></i> Upload</button>
+            </div>
+        </form>
+        @endif
+    </div>
+</div>
+
 @if($workOrder->serviceReports->count() > 0)
 <div class="card" style="margin-bottom:24px;">
     <div class="card-header"><h5><i class="fa-solid fa-file-lines" style="color:var(--primary);"></i> Service Reports ({{ $workOrder->serviceReports->count() }})</h5></div>
@@ -240,6 +288,18 @@
 .timeline-body{font-size:.875rem;color:#444;line-height:1.6}
 
 .comment-avatar{width:36px;height:36px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9rem;flex-shrink:0}
+
+.photo-item{border:1px solid #eee;border-radius:10px;overflow:hidden;background:#fafafa;position:relative}
+.photo-img{width:100%;height:140px;overflow:hidden;position:relative}
+.photo-img img{width:100%;height:100%;object-fit:cover}
+.photo-delete{position:absolute;top:4px;right:4px;width:24px;height:24px;border-radius:50%;border:none;background:rgba(220,53,69,.85);color:#fff;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;opacity:0;transition:opacity .2s}
+.photo-item:hover .photo-delete{opacity:1}
+.photo-info{padding:8px 10px;display:flex;flex-direction:column;gap:2px}
+.photo-type{display:inline-block;font-size:.65rem;font-weight:600;text-transform:uppercase;padding:1px 8px;border-radius:8px;width:fit-content}
+.photo-type.before{background:#fff3cd;color:#856404}
+.photo-type.after{background:#d4edda;color:#155724}
+.photo-type.other{background:#e2e3e5;color:#383d41}
+.photo-caption{font-size:.75rem;color:#888;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 </style>
 @endsection
 
@@ -292,6 +352,68 @@ function markAllComplete() {
                 },
                 error: function() {
                     Swal.fire('Error', 'Failed to complete work order.', 'error');
+                }
+            });
+        }
+    });
+}
+
+$('#photoUploadForm').on('submit', function(e) {
+    e.preventDefault();
+    const file = $('#photo_file')[0].files[0];
+    const type = $('#photo_type').val();
+    const caption = $('#photo_caption').val();
+
+    if (!file) {
+        Swal.fire('Validation', 'Select a photo to upload.', 'warning');
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('photo', file);
+    formData.append('type', type);
+    formData.append('caption', caption || '');
+    formData.append('_token', '{{ csrf_token() }}');
+
+    $.ajax({
+        url: '{{ route("admin.work-orders.upload-photo", $workOrder->id) }}',
+        method: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function() {
+            $('#photo_file').val('');
+            $('#photo_caption').val('');
+            Swal.fire({ icon: 'success', title: 'Photo uploaded!', timer: 1200, showConfirmButton: false });
+            setTimeout(() => location.reload(), 1200);
+        },
+        error: function(xhr) {
+            const msg = xhr.responseJSON?.message || 'Failed to upload photo.';
+            Swal.fire('Error', msg, 'error');
+        }
+    });
+});
+
+function deletePhoto(photoId) {
+    Swal.fire({
+        title: 'Delete Photo?',
+        text: 'This cannot be undone.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        confirmButtonText: 'Delete'
+    }).then(r => {
+        if (r.isConfirmed) {
+            $.ajax({
+                url: '/admin/work-orders/{{ $workOrder->id }}/photos/' + photoId,
+                method: 'DELETE',
+                data: { _token: '{{ csrf_token() }}' },
+                success: function() {
+                    $(`.photo-item[data-id="${photoId}"]`).fadeOut(300, function() { $(this).remove(); });
+                    Swal.fire({ icon: 'success', title: 'Deleted!', timer: 1000, showConfirmButton: false });
+                },
+                error: function() {
+                    Swal.fire('Error', 'Failed to delete photo.', 'error');
                 }
             });
         }

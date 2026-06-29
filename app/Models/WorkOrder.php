@@ -72,4 +72,9 @@ class WorkOrder extends Model
     {
         return $this->hasMany(WorkOrderProgressLog::class);
     }
+
+    public function photos()
+    {
+        return $this->hasMany(WorkOrderPhoto::class);
+    }
 }

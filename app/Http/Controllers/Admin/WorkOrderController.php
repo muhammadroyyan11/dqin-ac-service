@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\WorkOrder;
 use App\Models\Technician;
 use App\Models\WorkOrderProgressLog;
+use App\Models\WorkOrderPhoto;
 use App\Models\Customer;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
@@ -49,7 +50,7 @@ class WorkOrderController extends Controller
 
     public function detail(WorkOrder $workOrder)
     {
-        $workOrder->load('customer.customerUnits', 'customerUnit', 'technicians', 'serviceReports', 'progressLogs.technician', 'progressLogs.user');
+        $workOrder->load('customer.customerUnits', 'customerUnit', 'technicians', 'serviceReports', 'progressLogs.technician', 'progressLogs.user', 'photos.uploader');
         return view('admin.work-orders.detail', compact('workOrder'));
     }
 
@@ -197,6 +198,39 @@ class WorkOrderController extends Controller
     {
         $workOrder->technicians()->detach();
         $workOrder->delete();
+        return response()->json(['success' => true]);
+    }
+
+    public function uploadPhoto(Request $request, WorkOrder $workOrder)
+    {
+        $request->validate([
+            'photo' => 'required|image|max:5120',
+            'type' => 'required|in:before,after,other',
+            'caption' => 'nullable|string|max:255',
+        ]);
+
+        $path = $request->file('photo')->store('work-order-photos', 'public');
+
+        $photo = WorkOrderPhoto::create([
+            'work_order_id' => $workOrder->id,
+            'photo_path' => $path,
+            'type' => $request->type,
+            'caption' => $request->caption,
+            'uploaded_by' => auth()->id(),
+        ]);
+
+        return response()->json(['success' => true, 'data' => $photo]);
+    }
+
+    public function deletePhoto(WorkOrder $workOrder, WorkOrderPhoto $photo)
+    {
+        if ($photo->work_order_id !== $workOrder->id) {
+            return response()->json(['success' => false, 'message' => 'Photo not found.'], 404);
+        }
+
+        \Illuminate\Support\Facades\Storage::disk('public')->delete($photo->photo_path);
+        $photo->delete();
+
         return response()->json(['success' => true]);
     }
 }

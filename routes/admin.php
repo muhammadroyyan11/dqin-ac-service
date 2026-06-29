@@ -93,6 +93,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified'])->group(
         Route::delete('/{workOrder}', [WorkOrderController::class, 'destroy'])->name('destroy')->middleware('permission:work-orders.delete');
         Route::post('/{workOrder}/update-progress', [WorkOrderController::class, 'updateProgress'])->name('update-progress');
         Route::post('/{workOrder}/complete', [WorkOrderController::class, 'complete'])->name('complete');
+        Route::post('/{workOrder}/photos', [WorkOrderController::class, 'uploadPhoto'])->name('upload-photo');
+        Route::delete('/{workOrder}/photos/{photo}', [WorkOrderController::class, 'deletePhoto'])->name('delete-photo');
     });
 
     // Service Reports
