@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\ServiceReport;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -49,6 +50,7 @@ class ServiceReportController extends Controller
             })
             ->addColumn('action', function ($r) {
                 return '<button class="btn btn-sm btn-primary edit-btn" data-id="'.$r->id.'"><i class="fa-solid fa-pen"></i></button>
+                        <a href="'.route('admin.service-reports.pdf', $r->id).'" class="btn btn-sm btn-info"><i class="fa-solid fa-file-pdf"></i></a>
                         <button class="btn btn-sm btn-danger delete-btn" data-id="'.$r->id.'"><i class="fa-solid fa-trash"></i></button>';
             })
             ->rawColumns(['action'])
@@ -96,6 +98,13 @@ class ServiceReportController extends Controller
         $serviceReport->update($validated);
 
         return response()->json(['success' => true, 'data' => $serviceReport->load('workOrder', 'technician')]);
+    }
+
+    public function generatePdf(ServiceReport $serviceReport)
+    {
+        $serviceReport->load('workOrder.customer', 'technician');
+        $pdf = Pdf::loadView('admin.service-reports.pdf', ['report' => $serviceReport]);
+        return $pdf->download('service-report-'.$serviceReport->id.'.pdf');
     }
 
     public function destroy(ServiceReport $serviceReport)

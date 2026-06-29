@@ -104,6 +104,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified'])->group(
         Route::post('/', [ServiceReportController::class, 'store'])->name('store')->middleware('permission:service-reports.create');
         Route::get('/{serviceReport}', [ServiceReportController::class, 'show'])->name('show');
         Route::put('/{serviceReport}', [ServiceReportController::class, 'update'])->name('update')->middleware('permission:service-reports.edit');
+        Route::get('/{serviceReport}/pdf', [ServiceReportController::class, 'generatePdf'])->name('pdf');
         Route::delete('/{serviceReport}', [ServiceReportController::class, 'destroy'])->name('destroy')->middleware('permission:service-reports.delete');
     });
 
