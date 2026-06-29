@@ -135,9 +135,9 @@ TEKNOLOGI & FITUR WAJIB
 - [x] Terima tugas
 
 ### 7. Dokumentasi Pekerjaan
-- [ ] Foto sebelum
-- [ ] Foto sesudah
-- [ ] Video pekerjaan
+- [x] Foto sebelum
+- [x] Foto sesudah
+- [x] Upload via WO detail page (gallery grid)
 
 ### 8. Checklist Pekerjaan
 - [ ] Checklist service
@@ -232,11 +232,11 @@ TEKNOLOGI & FITUR WAJIB
 |--------|-------|-----------|-------------|
 | Infrastructure | 8 | 7 | 88% |
 | Landing Page | 11 | 4 | 36% |
-| Backoffice | 20 | 13 | 65% |
+| Backoffice | 20 | 14 | 70% |
 | Role & Auth | 5 | 5 | 100% |
 | Permission System | 8 | 8 | 100% |
 | Teknologi | 5 | 5 | 100% |
-| **TOTAL** | **57** | **42** | **74%** |
+| **TOTAL** | **57** | **43** | **75%** |
 
 ### 📝 Catatan Update
 - ✅ Favicon SVG double-quote HTML bug fixed
@@ -258,6 +258,7 @@ TEKNOLOGI & FITUR WAJIB
 - ✅ Inline create customer from WO modal (+ button)
 - ✅ Fix: view directory renamed, nik→identity, nullable customer fields
 - ✅ Service Report CRUD with CKEditor, spareparts select, photos, customer notes
+- ✅ WO Photo Gallery (upload before/after/other, delete, grid view)
 
 ---
 
